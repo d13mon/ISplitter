@@ -503,12 +503,7 @@ TEST_F(TestISplitterMain, test_PutGet)
 		for (const auto & data : dataList2) {
 			cout << getDataAsInt(data) << " ";
 		}
-		cout << endl;
-
-		/*cout << "MaxGetDelay1 = " << maxGetDelay1 << endl;
-		ASSERT_LE(maxGetDelay1, getDelayMsec + getDelayMsec * 0.1);
-		cout << "MaxGetDelay2 = " << maxGetDelay2 << endl;
-		ASSERT_LE(maxGetDelay2, getDelayMsec + getDelayMsec * 0.1);*/
+		cout << endl;		
 
 		ASSERT_EQ(dataList1.size(), checkDataSets[i].first.size());
 		for (size_t j = 0; j < dataList1.size(); j++) {
