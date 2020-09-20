@@ -179,10 +179,6 @@ int32_t ISplitter::Get(uint32_t nClientID, DataPtr& data, int32_t nWaitForNewDat
 
 int32_t ISplitter::Flush()
 {
-#if _DEBUG
-	cout << TAG << "FLUSH" << endl;
-#endif
-
 	unique_lock lock(mDataClientListMutex);
 	for (auto it = begin(mDataClientList); it != end(mDataClientList); ++it) {		
 		(*it)->FlushData();			
@@ -246,17 +242,10 @@ size_t ISplitter::DataClient::GetLatencyCount() const
 
 int32_t ISplitter::DataClient::PutData(const DataPtr& data, int32_t nWaitForBuffersFreeTimeOutMsec)
 {
-#if _DEBUG
-	cout << TAG  << "Client: " << std::setw(2) << mClientId << ": PUT " << (int)data->at(0) << endl;
-#endif
-
 	if (!mDataQueue->push(data, nWaitForBuffersFreeTimeOutMsec)) {
 		{
 			scoped_lock lock(mClientInfoMutex);
 			mDropped++;
-#if _DEBUG					
-		    cout << TAG << "Client: " << std::setw(2) << mClientId << ": TIMEOUT: droppedCount =" << mDropped << endl;
-#endif
 		}
 
 		return static_cast<int32_t>(Error::DataDropped);
@@ -267,29 +256,17 @@ int32_t ISplitter::DataClient::PutData(const DataPtr& data, int32_t nWaitForBuff
 
 int32_t ISplitter::DataClient::GetData(DataPtr& data, int32_t nWaitForNewDataTimeOutMsec)
 {
-#if _DEBUG
-	cout << TAG << "Client: " << std::setw(2) << mClientId << ": GET... " << endl;
-#endif
-
 	if (!mDataQueue->try_pop(data)) {
 		if (!mDataQueue->wait_and_pop(data, nWaitForNewDataTimeOutMsec)) {
 			return static_cast<int32_t>(Error::NoNewData);
 		}
-	}	
-
-#if _DEBUG
-	cout << TAG << "Client: " << std::setw(2) << mClientId << ": GET " << (data && data->size() ? (int)data->at(0) : -1) << endl;
-#endif
+	}
 
     return 0;
 }
 
 void ISplitter::DataClient::FlushData()
 {
-#if _DEBUG
-	cout << TAG << "Client: " << std::setw(2) << mClientId << ": FLUSH " << endl;
-#endif
-
 	auto maxLength = mDataQueue->max_length();
 	mDataQueue->flush();
 	mDataQueue.reset(new Queue(maxLength));

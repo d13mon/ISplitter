@@ -49,9 +49,7 @@ public:
 		}
 		else {
 			if (!mPushDataCondition.wait_for(lock, waitMs, [this] {return mFlushed || (mDataQueue.size() < mMaxLength); })) {
-#if _DEBUG
-				cout << TAG << "PUSH: TIMEOUT: DROP DATA = " << (int)mDataQueue.front()->at(0) << endl;
-#endif
+
 				mDataQueue.pop();
 				result = false;
 			}
@@ -71,10 +69,6 @@ public:
 	{
 		using namespace std;
 
-#if _DEBUG
-		cout << TAG << "WAIT_AND_POP: wait for " << nWaitForBuffersFreeTimeOutMsec << endl;
-#endif
-
 		bool waitInfinite = nWaitForBuffersFreeTimeOutMsec == -1;
 		std::chrono::milliseconds waitMs = waitInfinite ?
 			std::chrono::milliseconds{ 0 } : std::chrono::milliseconds{ nWaitForBuffersFreeTimeOutMsec };
@@ -86,9 +80,7 @@ public:
 		}
 		else {
 			if (!mPopDataCondition.wait_for(lock, waitMs, [this] {return mFlushed || !mDataQueue.empty(); })) {
-#if _DEBUG
-				cout << TAG << "WAIT_AND_POP: TIMEOUT" << endl;	
-#endif
+
 				return false;
 			}
 		}
@@ -165,10 +157,6 @@ public:
 	void flush() {	
 
 		using namespace std;
-
-#if _DEBUG
-		cout << TAG << "FLUSH" << endl;
-#endif	
 
 		{
 			std::queue<T> empty;
